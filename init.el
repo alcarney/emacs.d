@@ -112,7 +112,8 @@
         doom-themes-enable-italic t)
   (load-theme 'doom-nord t)
 
-  (doom-themes-org-config))
+  (doom-themes-org-config)
+  (doom-themes-treemacs-config))
 
 (use-package git-gutter
   :ensure t
@@ -136,11 +137,30 @@
   :ensure t
   :bind (("C-x g" . magit-status)))
 
+(use-package projectile
+  :ensure t
+  :bind (:map projectile-mode-map
+         ("C-c p" . 'projectile-command-map))
+  :config
+  (projectile-mode 1)
+
+  (setq projectile-completion-system 'ivy
+        projectile-project-search-path '("~/Projects")
+        projectile-sort-order 'recently-active))
+
 (use-package solaire-mode
   :ensure t
   :config
   (solaire-global-mode 1)
   (solaire-mode-swap-bg))
+
+(use-package swiper
+  :ensure t
+  :bind (("C-s" . swiper)))
+
+(use-package treemacs
+  :ensure t
+  :bind (("C-<tab>" . treemacs)))
 
 (use-package which-key
   :ensure t

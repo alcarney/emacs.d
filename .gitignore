@@ -1,2 +1,5 @@
 /auto-save-list/
 /elpa/
+/.cache/
+/projectile-bookmarks.eld
+/transient/
