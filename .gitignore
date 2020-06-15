@@ -3,3 +3,5 @@
 /.cache/
 /projectile-bookmarks.eld
 /transient/
+/elpy/
+/eshell/

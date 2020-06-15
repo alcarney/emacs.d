@@ -64,7 +64,8 @@
 ;; Whitespace
 (setq-default fill-column 88
               indent-tabs-mode nil
-              tab-width 4)
+              tab-width 4
+              whitespace-line-column 88)
 
 (setq whitespace-style '(face empty trailing lines-tail))
 (global-whitespace-mode)
@@ -115,6 +116,16 @@
   (doom-themes-org-config)
   (doom-themes-treemacs-config))
 
+
+(use-package elpy
+  :ensure t
+  :init (elpy-enable)
+  :hook (elpy-mode . (lambda ()
+                       (highlight-indentation-mode -1)
+                       (add-hook 'before-save-hook 'elpy-black-fix-code nil t)))
+  :config
+  (setq elpy-rpc-python-command "python3"))
+
 (use-package git-gutter
   :ensure t
   :config
@@ -127,6 +138,14 @@
   (setq git-gutter:added-sign "·"
         git-gutter:modified-sign "·"
         git-gutter:deleted-sign "·"))
+
+(use-package hydra
+  :ensure t
+  :config
+  (defhydra hydra-zoom (global-map "<f2>")
+    "zoom"
+    ("i" text-scale-increase "in")
+    ("o" text-scale-decrease "out")))
 
 (use-package ivy
   :ensure t
