@@ -45,7 +45,8 @@
 (global-set-key (kbd "C-p") 'init-el/previous-line)
 
 ;; UI Tweaks
-(setq show-paren-style 'parenthesis)
+(setq inhibit-startup-screen t
+      show-paren-style 'parenthesis)
 
 (blink-cursor-mode -1)
 (menu-bar-mode -1)
@@ -179,11 +180,19 @@
 
 (use-package treemacs
   :ensure t
-  :bind (("C-<tab>" . treemacs)))
+  :bind (("C-<tab>" . treemacs))
+  :config
+  (treemacs-git-mode 'extended)
+  (add-to-list 'treemacs-pre-file-insert-predicates 'treemacs-is-file-git-ignored?))
 
 (use-package which-key
   :ensure t
   :config (which-key-mode))
+
+(use-package yaml-mode
+  :ensure t
+  :mode (("\\.yaml\\'" . yaml-mode)
+         ("\\.yml\\'" . yaml-mode)))
 
 ;; Ensure that any custom settings are placed in their own file.
 (setq custom-file "~/.emacs.d/custom.el")
@@ -195,3 +204,4 @@
 
 (provide 'init)
 ;;; init.el ends here
+
