@@ -45,7 +45,8 @@
 (global-set-key (kbd "C-p") 'init-el/previous-line)
 
 ;; UI Tweaks
-(setq inhibit-startup-screen t
+(setq default-frame-alist '((font . "Ubuntu Mono-11"))
+      inhibit-startup-screen t
       show-paren-style 'parenthesis)
 
 (blink-cursor-mode -1)
@@ -58,9 +59,6 @@
 (global-display-line-numbers-mode 1)
 (size-indication-mode t)
 (show-paren-mode 1)
-
-(set-face-attribute 'default nil :font "Victor Mono SemiBold 9")
-(set-face-italic 'font-lock-comment-face t)
 
 ;; Whitespace
 (setq-default fill-column 88
@@ -204,4 +202,3 @@
 
 (provide 'init)
 ;;; init.el ends here
-
