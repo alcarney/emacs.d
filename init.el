@@ -155,6 +155,14 @@
   :ensure t
   :bind (("C-x g" . magit-status)))
 
+(use-package org
+  :bind (("C-c a" . org-agenda)
+         ("C-c c" . org-capture))
+  :config
+  (setq org-agenda-files '("~/Documents/org")
+        org-directory "~/Documents/org"
+        org-startup-indented t))
+
 (use-package projectile
   :ensure t
   :bind (:map projectile-mode-map
