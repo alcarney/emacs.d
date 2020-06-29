@@ -158,6 +158,8 @@
 (use-package org
   :bind (("C-c a" . org-agenda)
          ("C-c c" . org-capture))
+  :hook (org-mode . (lambda ()
+                      (turn-on-auto-fill)))
   :config
   (setq org-agenda-files '("~/Documents/org")
         org-directory "~/Documents/org"
