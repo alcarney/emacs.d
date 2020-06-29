@@ -110,7 +110,7 @@
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (load-theme 'doom-nord t)
+  ;;(load-theme 'doom-nord t)
 
   (doom-themes-org-config)
   (doom-themes-treemacs-config))
@@ -150,6 +150,11 @@
   :ensure t
   :bind (("C-x b" . ivy-switch-buffer)
          ("C-x C-b" . ivy-switch-buffer-other-window)))
+
+(use-package leuven-theme
+  :ensure t
+  :config
+  (load-theme 'leuven t))
 
 (use-package magit
   :ensure t
