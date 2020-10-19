@@ -28,21 +28,7 @@
     (if (= original-pos (point))
         (beginning-of-line))))
 
-(defun init-el/next-line ()
-  "Move point to next line, keeping it at the start"
-  (interactive)
-  (forward-line)
-  (beginning-of-line))
-
-(defun init-el/previous-line ()
-  "Move point to previous line, keeping it at the start"
-  (interactive)
-  (forward-line -1)
-  (beginning-of-line))
-
 (global-set-key (kbd "C-a") 'init-el/beginning-of-line)
-(global-set-key (kbd "C-n") 'init-el/next-line)
-(global-set-key (kbd "C-p") 'init-el/previous-line)
 
 ;; UI Tweaks
 (setq default-frame-alist '((font . "Ubuntu Mono-11"))
@@ -110,11 +96,12 @@
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  ;;(load-theme 'doom-nord t)
+  (load-theme 'doom-nord t)
 
   (doom-themes-org-config)
   (doom-themes-treemacs-config))
 
+(use-package ein :ensure t)
 
 (use-package elpy
   :ensure t
@@ -151,10 +138,7 @@
   :bind (("C-x b" . ivy-switch-buffer)
          ("C-x C-b" . ivy-switch-buffer-other-window)))
 
-(use-package leuven-theme
-  :ensure t
-  :config
-  (load-theme 'leuven t))
+;;(use-package leuven-theme :ensure t)
 
 (use-package magit
   :ensure t
@@ -188,8 +172,7 @@
   (solaire-mode-swap-bg))
 
 (use-package swiper
-  :ensure t
-  :bind (("C-s" . swiper)))
+  :ensure t)
 
 (use-package treemacs
   :ensure t
@@ -197,6 +180,11 @@
   :config
   (treemacs-git-mode 'extended)
   (add-to-list 'treemacs-pre-file-insert-predicates 'treemacs-is-file-git-ignored?))
+
+(use-package web-mode
+  :ensure t
+  :mode (("\\.html\\'" . web-mode)
+         ("\\.css\\'" . web-mode)))
 
 (use-package which-key
   :ensure t
