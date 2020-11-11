@@ -8,9 +8,9 @@
   (set-face-foreground 'git-gutter:modified "goldenrod")
   (set-face-foreground 'git-gutter:deleted "brown")
 
-  (setq git-gutter:added-sign "s"
-        git-gutter:modified-sign "▕"
-        git-gutter:removed-sign "▕"))
+  (setq git-gutter:added-sign "▐"
+        git-gutter:modified-sign "▐"
+        git-gutter:removed-sign "▐"))
 
 (use-package magit
   :bind (("C-x g" . magit-status)))
