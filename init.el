@@ -39,6 +39,7 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (require 'git-config)
+(require 'md-config)
 (require 'org-config)
 (require 'projectile-config)
 (require 'ivy-config)
