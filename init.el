@@ -45,6 +45,8 @@
 (require 'ivy-config)
 (require 'ui-config)
 
+(require 'lang-c)
+
 ;; Ensure that any custom settings are placed in their own file.
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)
