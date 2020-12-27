@@ -11,6 +11,7 @@
 
 (set-face-attribute 'default nil :font "Ubuntu Mono" :height 125)
 (set-face-attribute 'fixed-pitch nil :font "Ubuntu Mono" :height 125)
+(set-face-attribute 'variable-pitch nil :font "Ubuntu Medium" :height 125)
 
 (setq inhibit-startup-message t)
 
