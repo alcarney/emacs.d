@@ -20,7 +20,6 @@
 
   (org-indent-mode)
   (variable-pitch-mode 1)
-  (display-line-numbers-mode 0)
 
   (me/org-mode-setup-faces))
 

@@ -5,9 +5,19 @@
 (blink-cursor-mode -1)
 
 (column-number-mode 1)
-(global-display-line-numbers-mode 1)
 (size-indication-mode 1)
 (show-paren-mode 1)
+
+;; Line numbers
+(global-display-line-numbers-mode 1)
+
+(dolist (mode '(doc-view-mode-hook
+                eshell-mode-hook
+                org-mode-hook
+                shell-mode-hook
+	        treemacs-mode-hook
+                term-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (set-face-attribute 'default nil :font "Ubuntu Mono" :height 125)
 (set-face-attribute 'fixed-pitch nil :font "Ubuntu Mono" :height 125)
