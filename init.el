@@ -12,10 +12,18 @@
 
 (global-auto-revert-mode 1)
 
+(setq sentence-end-double-space nil)
+
 (setq-default indent-tabs-mode nil)
-(setq whitespace-style '(face empty trailing lines-tail))
+(setq whitespace-style '(face empty trailing))
 (global-whitespace-mode)
 (add-hook 'before-save-hook #'whitespace-cleanup)
+
+;; Completions
+(fido-mode)
+
+;; Project management
+(global-set-key (kbd "C-c p f") 'project-find-file)
 
 ;; Packaging bootstrap
 (require 'package)
@@ -41,8 +49,6 @@
 (require 'git-config)
 (require 'md-config)
 (require 'org-config)
-(require 'projectile-config)
-(require 'ivy-config)
 (require 'ui-config)
 
 (require 'lang-c)
