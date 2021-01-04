@@ -62,8 +62,5 @@
   (add-to-list 'treemacs-pre-file-insert-predicates
                #'treemacs-is-file-git-ignored?))
 
-(use-package which-key
-  :init (which-key-mode))
-
 (provide 'ui-config)
 ;;; ui-config.el ends here
