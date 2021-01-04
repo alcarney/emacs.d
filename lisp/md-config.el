@@ -6,7 +6,8 @@
          ("\\.markdown\\'" . gfm-mode))
   :hook (gfm-mode . (lambda ()
                       (setq fill-column 80)
-                      (turn-on-auto-fill))))
+                      (turn-on-auto-fill)
+                      (flyspell-mode))))
 
 (provide 'md-config)
 ;;; md-config.el ends here
