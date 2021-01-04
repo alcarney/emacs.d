@@ -23,7 +23,23 @@
 (fido-mode)
 
 ;; Project management
+(defun me/project-search ()
+  "Execute a project wide search with ripgrep
+
+TODO: Take a prefix argument that allows to set the filename
+pattern to search on?"
+  (interactive)
+  (let ((dir   (cdr (project-current t)))
+        (query (read-string "Search query: ")))
+    (rg query "*" dir)))
+
+(use-package project
+  :bind (("C-c p f" . project-find-file)
+         ("C-c p s" . me/project-search)))
+
+
 (global-set-key (kbd "C-c p f") 'project-find-file)
+(global-set-key (kbd "C-c p s") 'me/project-search)
 
 ;; Packaging bootstrap
 (require 'package)
