@@ -33,11 +33,6 @@ pattern to search on?"
         (query (read-string "Search query: ")))
     (rg query "*" dir)))
 
-(use-package project
-  :bind (("C-c p f" . project-find-file)
-         ("C-c p s" . me/project-search)))
-
-
 (global-set-key (kbd "C-c p f") 'project-find-file)
 (global-set-key (kbd "C-c p s") 'me/project-search)
 
