@@ -71,6 +71,8 @@
   :ensure t
   :init (doom-modeline-mode 1)
   :config
+  (column-number-mode 1)
+  (size-indication-mode 1)
   (setq doom-modeline-buffer-file-name-style 'relative-to-project
         doom-modeline-buffer-modification-icon t
         doom-modeline-buffer-state-icon t
@@ -99,7 +101,24 @@
         modus-themes-slanted-constructs t)
 
   ;; Default to the light theme
-  (modus-themes-load-operandi))
+  (modus-themes-load-operandi)
+
+  (show-paren-mode 1))
+
+(use-package window
+  :init
+  (setq display-buffer-alist
+        '(("\\*Help\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.20)
+           (side . top)
+           (slot . 0))
+          ("\\*\\(e?shell\\)\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.25)
+           (side . bottom)
+           (slot . 0))))
+  :bind (("<f8>" . window-toggle-side-windows)))
 
 (use-package git-gutter
   :config

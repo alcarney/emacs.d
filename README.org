@@ -6,9 +6,9 @@
 Because I wanted to play with some of the latest goodies like ~project.el~ and
 ~tab-bar.el~ I ended up having to compile Emacs from source to get the latest.
 
-**Getting the Source**
+*Getting the Source*
 
-Emacs is an /old/ project and the Git repo is suitably large, since I'm only after a
+Emacs is an old project and the Git repo is suitably large, since I'm only after a
 particular branch we can ask Git to fetch just that branch.
 
 #+begin_src sh
@@ -26,7 +26,7 @@ JSON parsing - useful if I ever setup ~lsp-mode~ or ~eglot~
   sudo apt install libjansson libjansson-dev
 #+end_src
 
-**Building**
+*Building*
 
 With the prerequisites taken care of building and installing is the familiar
 ~configure~, ~make~, ~make install~ process.
@@ -199,6 +199,8 @@ Unless I specify a particular mode in which to disable them
     :ensure t
     :init (doom-modeline-mode 1)
     :config
+    (column-number-mode 1)
+    (size-indication-mode 1)
     (setq doom-modeline-buffer-file-name-style 'relative-to-project
           doom-modeline-buffer-modification-icon t
           doom-modeline-buffer-state-icon t
@@ -239,7 +241,40 @@ themselves rendered
           modus-themes-slanted-constructs t)
 
     ;; Default to the light theme
-    (modus-themes-load-operandi))
+    (modus-themes-load-operandi)
+
+    (show-paren-mode 1))
+#+end_src
+
+** Windows
+
+#+begin_src emacs-lisp :noweb yes :tangle init.el
+  (use-package window
+    :init
+    <<window-placement>>
+    :bind (("<f8>" . window-toggle-side-windows)))
+#+end_src
+
+*** Placement
+
+After using Emacs for any length of time, you'll quickly find that new windows
+pop open all the time in various locations as you call different commands. After
+finding [[https://www.youtube.com/watch?v=rjOhJMbA-q0][this video]] on the  [[help:display-buffer-alist][display-buffer-alist]] variable, it turns out Emacs
+offers a very rich framework for controlling what windows get opened where - I
+should have guessed!
+
+#+begin_src emacs-lisp :noweb-ref window-placement
+  (setq display-buffer-alist
+        '(("\\*Help\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.20)
+           (side . top)
+           (slot . 0))
+          ("\\*\\(e?shell\\)\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.25)
+           (side . bottom)
+           (slot . 0))))
 #+end_src
 
 * Programs
