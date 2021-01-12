@@ -1,0 +1,503 @@
+#+TITLE: Emacs Configuration
+
+* Setup
+
+** Installing Emacs
+Because I wanted to play with some of the latest goodies like ~project.el~ and
+~tab-bar.el~ I ended up having to compile Emacs from source to get the latest.
+
+**Getting the Source**
+
+Emacs is an /old/ project and the Git repo is suitably large, since I'm only after a
+particular branch we can ask Git to fetch just that branch.
+
+#+begin_src sh
+  git clone --depth 1 --branch emacs-27 https://git.savannah.gnu.org/git/emacs.git
+#+end_src
+
+*Build Dependencies*
+
+After enabling ~deb-src~ repos in Ubuntu getting all the build dependencies for Emacs
+was easy enough. I also made sure ~libjansson~ was available so that I could get native
+JSON parsing - useful if I ever setup ~lsp-mode~ or ~eglot~
+
+#+begin_src sh
+  sudo apt build-dep emacs
+  sudo apt install libjansson libjansson-dev
+#+end_src
+
+**Building**
+
+With the prerequisites taken care of building and installing is the familiar
+~configure~, ~make~, ~make install~ process.
+
+#+begin_src sh
+  ./configure
+  make -j 4
+  make install
+#+end_src
+
+** Config Start
+
+My ~init.el~ file starts here
+
+#+begin_src emacs-lisp :tangle init.el
+  ;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
+  (defconst emacs-start-time (current-time))
+#+end_src
+
+** Packaging
+
+Setting up the package archives
+
+#+begin_src emacs-lisp :tangle init.el
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("org"   . "https://orgmode.org/elpa/")
+                           ("elpa"  . "https://elpa.gnu.org/packages/")))
+#+end_src
+
+On first boot of a new install we of course are going to want to install a bunch of
+packages so it makes sense to ensure we have an up to date archive
+
+#+begin_src emacs-lisp :tangle init.el
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+#+end_src
+
+** Use Package
+
+I use [[https://github.com/jwiegley/use-package][use-package]] heavily in my configuration, let's make sure it's available.
+
+#+begin_src emacs-lisp :tangle init.el
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+#+end_src
+
+* Misc Settings
+
+** Backups
+
+Don't clutter directories with autosaves and backups...
+
+#+begin_src emacs-lisp :tangle init.el
+  (setq auto-save-default nil
+        create-lockfiles  nil
+        make-backup-files nil)
+#+end_src
+
+Most of what I work with is in Git so I'd rather if buffers just kept sync with what's
+on disk
+
+#+begin_src emacs-lisp :tangle init.el
+(global-auto-revert-mode 1)
+#+end_src
+
+** Encoding
+
+#+begin_src emacs-lisp :tangle init.el
+  (set-language-environment "UTF-8")
+  (set-default-coding-systems 'utf-8)
+#+end_src
+
+** Whitespace
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package whitespace
+    :init
+    (setq sentence-end-double-space nil
+          whitespace-style '(face empty trailing))
+
+    (setq-default indent-tabs-mode nil)
+
+    (global-whitespace-mode)
+    (add-hook 'before-save-hook #'whitespace-cleanup))
+#+end_src
+
+* UI
+
+Disable a bunch of UI elements
+
+#+begin_src emacs-lisp :tangle init.el
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (blink-cursor-mode -1)
+
+  (setq inhibit-startup-message t)
+#+end_src
+
+** Buffers
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package ibuffer
+    :bind (("C-x C-b" . ibuffer)))
+#+end_src
+
+** Completion
+
+*** IComplete
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package icomplete
+    :init
+    (fido-mode 1))
+#+end_src
+
+** Fonts
+
+I quite like the Ubuntu family of fonts
+
+#+begin_src emacs-lisp :tangle init.el
+  (set-face-attribute 'default nil :font "Ubuntu Mono" :height 125)
+  (set-face-attribute 'fixed-pitch nil :font "Ubuntu Mono" :height 125)
+  (set-face-attribute 'variable-pitch nil :font "Ubuntu Light" :height 125)
+#+end_src
+
+** Icons
+
+Why not? 😃
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package all-the-icons
+    :ensure t)
+#+end_src
+
+*Dired*
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package all-the-icons-dired
+    :hook (dired-mode . all-the-incons-dired-mode))
+#+end_src
+
+** Line Numbers
+
+I want Emacs by default to enable line numbers in buffers
+
+#+begin_src emacs-lisp :tangle init.el
+(global-display-line-numbers-mode 1)
+#+end_src
+
+Unless I specify a particular mode in which to disable them
+
+#+begin_src emacs-lisp :tangle init.el
+  (dolist (hook '(doc-view-mode-hook
+                  eshell-mode-hook
+                  gfm-mode-hook
+                  org-mode-hook
+                  shell-mode-hook
+                  term-mode-hook))
+    (add-hook hook (lambda () (display-line-numbers-mode 0))))
+#+end_src
+
+** Modeline
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-buffer-file-name-style 'relative-to-project
+          doom-modeline-buffer-modification-icon t
+          doom-modeline-buffer-state-icon t
+          doom-modeline-height 25
+          doom-modeline-major-mode-icon t
+          doom-modeline-major-mode-color-icon nil
+          doom-modeline-minor-modes nil))
+#+end_src
+
+** Tab Bar
+
+Emacs 27 comes with vim style tabs (i.e. a tab holds a collection of windows in some
+layout ) via ~tab-bar.el~. While I want to use them, I'd rather not see the tabs
+themselves rendered
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package tab-bar
+    :config
+    (setq tab-bar-show nil))
+#+end_src
+
+** Theme
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package modus-themes
+    :ensure t
+    :bind ("<f5>" . modus-themes-toggle)
+    :init
+    (setq modus-themes-diffs              'desaturated
+          modus-themes-headings           '((t . rainbow-section-no-bold))
+          modus-themes-intense-hl-line    t
+          modus-themes-lang-checkers      'straight-underline
+          modus-themes-links              'faint-neutral-underline
+          modus-themes-org-blocks         'grayscale
+          modus-themes-paren-match        'intense-bold
+          modus-themes-region             'bg-only-no-extend
+          modus-themes-scale-headings     t
+          modus-themes-slanted-constructs t)
+
+    ;; Default to the light theme
+    (modus-themes-load-operandi))
+#+end_src
+
+* Programs
+
+** Git
+
+*** Git Gutter
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package git-gutter
+    :config
+    (global-git-gutter-mode 1)
+
+    (set-face-foreground 'git-gutter:added "forest green")
+    (set-face-foreground 'git-gutter:modified "goldenrod")
+    (set-face-foreground 'git-gutter:deleted "brown")
+
+    (setq git-gutter:added-sign "▐"
+          git-gutter:modified-sign "▐"
+          git-gutter:removed-sign "▐"))
+#+end_src
+
+*** Magit
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package magit
+    :bind (("C-x g" . magit-status)))
+#+end_src
+
+** Project Management
+
+#+begin_src emacs-lisp :tangle init.el :noweb yes
+  <<project-functions>>
+
+  <<project-packages>>
+
+  (use-package project
+    :bind (("C-c p f" . project-find-file)
+           ("C-c p s" . me/project-search)))
+#+end_src
+
+*** Project -wide Search
+
+#+begin_src emacs-lisp :noweb-ref project-functions
+  (defun me/project-search ()
+    "Execute a project wide search with ripgrep."
+    (interactive)
+    (let ((dir   (cdr (project-current t)))
+          (query (read-string "Search query: ")))
+      (rg query "*" dir)))
+#+end_src
+
+**** TODO Check for a prefix argument and prompt for the filename pattern to search on?
+
+*** Additional Packages
+
+[[https://github.com/dajva/rg.el][rg]] is an Emacs frontend to [[https://github.com/BurntSushi/ripgrep][ripgrep]].
+
+#+begin_src emacs-lisp :noweb-ref project-packages
+  (use-package rg
+    :ensure t)
+#+end_src
+
+* Programming
+
+** C
+
+#+begin_src emacs-lisp :noweb yes :tangle init.el
+  <<c-functions>>
+
+  (use-package cc-mode
+    :bind (:map c-mode-map
+                ("C-c d" . me/start-debugging)
+                ("C-c g" . recompile))
+    :config
+    (setq-default c-basic-offset 4))
+#+end_src
+
+
+*** Start Debugging
+
+Making use of ~tab-bar.el~ here is a custom function that starts a debugging session by
+first opening a new tab. This allows for the use of ~gdb-many-windows~ without messing
+with the current window layout.
+
+#+begin_src emacs-lisp :noweb-ref c-functions
+  (defun me/start-debugging ()
+    (interactive)
+    (let ((program (read-string "Debug program: ")))
+      (tab-new)
+      (setq gdb-many-windows t)
+      (gdb (format "gdb -i=mi %s" program))))
+
+#+end_src
+
+*** Stop Debugging
+
+This complements the function above, by listening for the end of the debugging session
+and closing the tab. I don't really understand how this works, but I adapted it from
+[[https://www.doof.me.uk/2019/06/09/making-emacs-gud-usable/][this blogpost]]
+
+#+begin_src emacs-lisp :noweb-ref c-functions
+  (advice-add 'gud-sentinel :after
+              (lambda (proc msg)
+                (when (memq (process-status proc) '(signal exit))
+                  (tab-close))))
+#+end_src
+
+** Python
+
+#+begin_src emacs-lisp :noweb yes :tangle init.el
+  <<python-functions>>
+
+  <<python-packages>>
+
+  (use-package python
+    :bind (:map python-mode-map
+                ("C-c C-p" . me/python-open-repl))
+    :config
+    <<python-config>>)
+#+end_src
+
+*** Opening a Python REPL
+
+The builtin [[help:python-mode][python-mode]] has a [[help:run-python][run-python]] command that will launch a Python REPL that we
+can interact with. Unfortunately by default it will just try runnning your system
+python - not very useful.
+
+Instead I have written a function that builds on ~project.el~ that will attempt to find
+the project's virtualenv and run a Jupyter REPL, falling back to Python if it is not
+installed.
+
+#+begin_src emacs-lisp :noweb-ref python-functions
+  (defun me/python-open-repl ()
+    "Open a Python REPL in the correct virtualenv for the
+    project.
+
+  This will first look for Jupyter and will fall back to Python if
+  it's not installed."
+    (interactive)
+    (let* ((dir   (cdr (project-current t)))
+           (paths (list
+                     (concat dir ".env/bin/jupyter")
+                     (concat dir ".env/bin/python")))
+           (path  (car (seq-filter 'file-exists-p paths))))
+
+      (setq python-shell-interpreter path
+            python-shell-prompt-detect-failure-warning nil)
+
+      (if (string-match-p (regexp-quote "jupyter") path)
+          (setq python-shell-interpreter-args "console --simple-prompt")
+        (setq python-shell-interpreter-args "-i"))
+
+      (run-python)))
+#+end_src
+
+So that we get to use Jupyer's tab completion, we just need to tell Emacs to not use its
+own.
+
+#+begin_src emacs-lisp :noweb-ref python-config
+  (add-to-list 'python-shell-completion-native-disabled-interpreters
+               "jupyter")
+#+end_src
+
+*** Additional Packages
+
+[[https://github.com/pythonic-emacs/blacken][blacken]] will automatcially apply [[https://github.com/psf/black][black]] to the buffer on save.
+
+#+begin_src emacs-lisp :noweb-ref python-packages
+  (use-package blacken
+    :ensure t
+    :hook (python-mode . blacken-mode))
+#+end_src
+
+This will of course require the ~black~ command to be available, easiest way to do this
+is to install it via [[https://github.com/pipxproject/pipx][pipx]]
+
+#+begin_src sh
+pipx install black
+#+end_src
+
+* Prose
+
+** Markdown
+
+#+begin_src emacs-lisp :tangle init.el
+  (use-package markdown-mode
+    :ensure t
+    :hook (gfm-mode . (lambda ()
+                        (setq-local fill-column 80)
+                        (turn-on-auto-fill)
+                        (flyspell-mode)))
+    :mode (("\\.md\\'" . gfm-mode)
+           ("\\.markdown\\'" . gfm-mode)))
+#+end_src
+
+** Org Mode
+
+#+begin_src emacs-lisp :tangle init.el :noweb yes
+  <<org-functions>>
+
+  (use-package org
+    :hook (org-mode . me/org-mode-tweaks)
+    :config
+    (setq org-directory "~/Documents/org"
+          org-startup-indented t))
+#+end_src
+
+*** Tweaks
+
+A collection of tweaks to apply when opening a new org file
+
+#+begin_src emacs-lisp :noweb-ref org-functions
+  (defun me/org-mode-tweaks ()
+    (setq-local fill-column 80)
+    (turn-on-auto-fill)
+    (flyspell-mode)
+
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+
+    ;; Switch certain elements back to fixed pitch
+    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil
+                        :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil
+                        :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+#+end_src
+
+* Finishing Up
+** Custom
+
+Ensure that anything set through ~custom~ is saved to a separate file
+
+#+begin_src emacs-lisp :tangle init.el
+  (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file 'noerror)
+#+end_src
+
+** Startup Time
+
+Add a log message that gives us an indication on how long it took to load the config.
+
+#+begin_src emacs-lisp :tangle init.el
+  (let ((startup-time
+         (float-time (time-subtract (current-time) emacs-start-time))))
+    (message "Loaded configuration in %.3fs" startup-time))
+#+end_src
+
+** Auto Tangling
+
+The following ~Local Variables~ block sets up an on save hook that automatically tangles
+this file so that ~init.el~ is always in sync with the latest.
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle)) nil t)
+# End:
