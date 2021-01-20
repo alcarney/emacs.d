@@ -114,6 +114,16 @@
            (display-buffer-in-side-window)
            (window-height . 0.25)
            (side . bottom)
+           (slot . 0))
+          ("\\*compilation\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.25)
+           (side . bottom)
+           (slot . 0))
+          ("\\*Python\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.25)
+           (side . bottom)
            (slot . 0))))
   :bind (("<f8>" . window-toggle-side-windows)))
 
