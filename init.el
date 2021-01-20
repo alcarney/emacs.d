@@ -143,8 +143,8 @@
   :ensure t)
 
 (use-package project
-  :bind (("C-c p f" . project-find-file)
-         ("C-c p s" . me/project-search)))
+  :bind (("C-x p f" . project-find-file)
+         ("C-x p s" . me/project-search)))
 
 (defun me/start-debugging ()
   (interactive)
