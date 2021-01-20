@@ -167,9 +167,10 @@ Why not? 😃
 
 *Dired*
 
-#+begin_src emacs-lisp :tangle init.el
+#+begin_src emacs-lisp
   (use-package all-the-icons-dired
-    :hook (dired-mode . all-the-incons-dired-mode))
+    :ensure t
+    :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
 ** Line Numbers

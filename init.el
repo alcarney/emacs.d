@@ -54,9 +54,6 @@
 (use-package all-the-icons
   :ensure t)
 
-(use-package all-the-icons-dired
-  :hook (dired-mode . all-the-incons-dired-mode))
-
 (global-display-line-numbers-mode 1)
 
 (dolist (hook '(doc-view-mode-hook
