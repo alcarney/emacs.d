@@ -173,7 +173,8 @@
               ("C-c d" . me/start-debugging)
               ("C-c g" . recompile))
   :config
-  (setq-default c-basic-offset 4))
+  (setq-default c-basic-offset 4)
+  (setq compilation-scroll-output t))
 
 (defun me/python-open-repl ()
   "Open a Python REPL in the correct virtualenv for the
