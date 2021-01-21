@@ -421,9 +421,20 @@ and closing the tab. I don't really understand how this works, but I adapted it 
     :bind (:map python-mode-map
                 ("C-c C-p" . me/python-open-repl)
                 ("C-c g"   . recompile))
+    :hook (python-mode . me/python-mode-tweaks)
     :config
     (setq compilation-scroll-output t)
     <<python-config>>)
+#+end_src
+
+*** Tweaks
+
+Tweaks to apply when opening Python files
+
+#+begin_src emacs-lisp :noweb-ref python-functions
+  (defun me/python-mode-tweaks ()
+    (setq-local fill-column 88))
+
 #+end_src
 
 *** Opening a Python REPL

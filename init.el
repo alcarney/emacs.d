@@ -184,6 +184,9 @@
   (setq-default c-basic-offset 4)
   (setq compilation-scroll-output t))
 
+(defun me/python-mode-tweaks ()
+  (setq-local fill-column 88))
+
 (defun me/python-open-repl ()
   "Open a Python REPL in the correct virtualenv for the
   project.
@@ -214,6 +217,7 @@ it's not installed."
   :bind (:map python-mode-map
               ("C-c C-p" . me/python-open-repl)
               ("C-c g"   . recompile))
+  :hook (python-mode . me/python-mode-tweaks)
   :config
   (setq compilation-scroll-output t)
   (add-to-list 'python-shell-completion-native-disabled-interpreters
