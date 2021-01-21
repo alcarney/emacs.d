@@ -102,10 +102,18 @@
 
   (show-paren-mode 1))
 
+(defun me/buffer-select-by-major-mode (mode)
+  "A filter for use with `display-buffer-alist', will select a
+  buffer if it matches the given major-mode"
+  (lambda (buffer action)
+    (with-current-buffer buffer
+      (eq major-mode mode))))
+
+
 (use-package window
   :init
   (setq display-buffer-alist
-        '(("\\*Help\\*"
+        `(("\\*Help\\*"
            (display-buffer-in-side-window)
            (window-height . 0.20)
            (side . top)
@@ -115,7 +123,7 @@
            (window-height . 0.25)
            (side . bottom)
            (slot . 0))
-          ("\\*compilation\\*"
+          (,(me/buffer-select-by-major-mode 'compilation-mode)
            (display-buffer-in-side-window)
            (window-height . 0.25)
            (side . bottom)
