@@ -211,12 +211,20 @@ it's not installed."
   (add-to-list 'python-shell-completion-native-disabled-interpreters
                "jupyter"))
 
+(defun me/gfm-mode-tweaks ()
+  (setq-local fill-column 80)
+  (turn-on-auto-fill)
+  (flyspell-mode)
+
+  (variable-pitch-mode 1)
+
+  ;; Switch certain elements back to fixed pitch
+  (set-face-attribute 'markdown-metadata-key-face nil :inherit 'fixed-pitch)
+  (set-face-attribute 'markdown-metadata-value-face nil :inherit 'fixed-pitch))
+
 (use-package markdown-mode
   :ensure t
-  :hook (gfm-mode . (lambda ()
-                      (setq-local fill-column 80)
-                      (turn-on-auto-fill)
-                      (flyspell-mode)))
+  :hook (gfm-mode . me/gfm-mode-tweaks)
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . gfm-mode)))
 
