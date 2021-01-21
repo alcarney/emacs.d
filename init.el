@@ -204,8 +204,10 @@ it's not installed."
 
 (use-package python
   :bind (:map python-mode-map
-              ("C-c C-p" . me/python-open-repl))
+              ("C-c C-p" . me/python-open-repl)
+              ("C-c g"   . recompile))
   :config
+  (setq compilation-scroll-output t)
   (add-to-list 'python-shell-completion-native-disabled-interpreters
                "jupyter"))
 

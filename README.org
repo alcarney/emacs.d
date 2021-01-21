@@ -404,8 +404,10 @@ and closing the tab. I don't really understand how this works, but I adapted it 
 
   (use-package python
     :bind (:map python-mode-map
-                ("C-c C-p" . me/python-open-repl))
+                ("C-c C-p" . me/python-open-repl)
+                ("C-c g"   . recompile))
     :config
+    (setq compilation-scroll-output t)
     <<python-config>>)
 #+end_src
 
