@@ -102,6 +102,14 @@ on disk
   (set-default-coding-systems 'utf-8)
 #+end_src
 
+** Long Lines
+
+By default, truncate long lines
+
+#+begin_src emacs-lisp :tangle init.el
+(setq-default truncate-lines t)
+#+end_src
+
 ** Whitespace
 
 #+begin_src emacs-lisp :tangle init.el
