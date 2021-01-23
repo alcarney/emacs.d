@@ -166,6 +166,46 @@
   :bind (("C-x p f" . project-find-file)
          ("C-x p s" . me/project-search)))
 
+(defun me/org-mode-tweaks ()
+  (setq-local fill-column 80)
+  (turn-on-auto-fill)
+  (flyspell-mode)
+
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+
+  ;; Switch certain elements back to fixed pitch
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil
+                      :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil
+                      :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(use-package org
+  :hook (org-mode . me/org-mode-tweaks)
+  :bind (("C-c a" . org-agenda)
+         ("C-c c" . org-capture))
+  :config
+  (setq org-directory "~/Documents/org/")
+  (setq org-agenda-files (list org-directory))
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               '((emacs-lisp . t)
+                                 (python . t)))
+  (setq org-capture-templates
+        '(("t" "Task" entry (file+headline "life.org" "Events")
+           "* TODO %?\n")
+          ("e" "Event" entry (file+headline "life.org" "Events")
+           "* %?\nSCHEDULED: %^t")
+          ("j" "Journal" entry (file+headline "life.org" "Journal")
+           "* %u\n%?\n\n** Exercise\n")))
+  (add-to-list 'org-modules 'org-habit t)
+  (setq org-habit-show-all-today t
+        org-log-into-drawer t))
+
 (defun me/start-debugging ()
   (interactive)
   (let ((program (read-string "Debug program: ")))
@@ -241,31 +281,6 @@ it's not installed."
   :hook (gfm-mode . me/gfm-mode-tweaks)
   :mode (("\\.md\\'" . gfm-mode)
          ("\\.markdown\\'" . gfm-mode)))
-
-(defun me/org-mode-tweaks ()
-  (setq-local fill-column 80)
-  (turn-on-auto-fill)
-  (flyspell-mode)
-
-  (org-indent-mode)
-  (variable-pitch-mode 1)
-
-  ;; Switch certain elements back to fixed pitch
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil
-                      :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil
-                      :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
-
-(use-package org
-  :hook (org-mode . me/org-mode-tweaks)
-  :config
-  (setq org-directory "~/Documents/org"
-        org-startup-indented t))
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)
