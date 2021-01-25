@@ -113,35 +113,37 @@
     (with-current-buffer buffer
       (eq major-mode mode))))
 
+(defun me/display-tabbed-buffer-in-side-window (buffer alist)
+  "See `display-buffer-in-side-window'"
+  (display-buffer-in-side-window buffer alist)
+  (with-current-buffer buffer
+    (tab-line-mode)))
+
+(dolist (hook '(shell-mode-hook
+                eshell-mode-hook))
+  (add-hook hook (lambda () (tab-line-mode))))
+(defun me/display-buffer-in-panel (predicate)
+  "Display buffers matching the given PREDICATE in the panel.
+
+To borrow terminology from VSCode the panel is that collapsable
+window at the bottom of the screen.
+"
+  `(,predicate
+    (me/display-tabbed-buffer-in-side-window)
+    (window-height . 0.25)
+    (side . bottom)
+    (slot . 0)
+    (window-parameters . ((no-other-window . t)))))
+
 
 (use-package window
   :init
-  (setq display-buffer-alist
-        `(("\\*Help\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.20)
-           (side . top)
-           (slot . 0))
-        ("\\*Ibuffer\\*"
-         (display-buffer-in-side-window)
-         (window-height . 0.25)
-         (side . bottom)
-         (slot . 0))
-          ("\\*\\(e?shell\\)\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.25)
-           (side . bottom)
-           (slot . 0))
-          (,(me/buffer-select-by-major-mode 'compilation-mode)
-           (display-buffer-in-side-window)
-           (window-height . 0.25)
-           (side . bottom)
-           (slot . 0))
-          ("\\*Python\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.25)
-           (side . bottom)
-           (slot . 0))))
+  (setq display-buffer-alist `(,(me/display-buffer-in-panel "\\*Help\\*")
+                               ,(me/display-buffer-in-panel "\\*\\(e?shell\\)\\*")
+                               ,(me/display-buffer-in-panel
+                                 (me/buffer-select-by-major-mode 'compilation-mode))
+                               ,(me/display-buffer-in-panel "\\*Ibuffer\\*")
+                               ))
   :bind (("<f8>" . window-toggle-side-windows)))
 
 (use-package git-gutter

@@ -1,4 +1,5 @@
 #+TITLE: Emacs Configuration
+#+TODO: TODO FIXME | DONE FIXED
 
 * Setup
 
@@ -154,11 +155,7 @@ I like ~ibuffer~ to open itself in a bottom side window, like many of the
 "additional" utilities I put down there
 
 #+begin_src emacs-lisp :noweb-ref window-placement-rules
-  ("\\*Ibuffer\\*"
-   (display-buffer-in-side-window)
-   (window-height . 0.25)
-   (side . bottom)
-   (slot . 0))
+  ,(me/display-buffer-in-panel "\\*Ibuffer\\*")
 #+end_src
 
 In order for ~ibuffer~ to call [[help:display-buffer][display-buffer]] and thus have the rules defined in
@@ -300,29 +297,15 @@ offers a very rich framework for controlling what windows get opened where - I
 should have guessed!
 
 #+begin_src emacs-lisp :noweb-ref window-placement :noweb yes
-  (setq display-buffer-alist
-        `(("\\*Help\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.20)
-           (side . top)
-           (slot . 0))
-        <<window-placement-rules>>
-          ("\\*\\(e?shell\\)\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.25)
-           (side . bottom)
-           (slot . 0))
-          (,(me/buffer-select-by-major-mode 'compilation-mode)
-           (display-buffer-in-side-window)
-           (window-height . 0.25)
-           (side . bottom)
-           (slot . 0))
-          ("\\*Python\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.25)
-           (side . bottom)
-           (slot . 0))))
+  (setq display-buffer-alist `(,(me/display-buffer-in-panel "\\*Help\\*")
+                               ,(me/display-buffer-in-panel "\\*\\(e?shell\\)\\*")
+                               ,(me/display-buffer-in-panel
+                                 (me/buffer-select-by-major-mode 'compilation-mode))
+                               <<window-placement-rules>>
+                               ))
 #+end_src
+
+**** Custom Filters
 
 The following function handles selecting buffers based on their major mode.
 **Requires lexical-binding**
@@ -337,14 +320,48 @@ The following function handles selecting buffers based on their major mode.
 
 #+end_src
 
-**** TODO See if I can create my own custom action function that makes it easy to standardise buffer handling
+**** Custom Actions
 
-e.g. a ~me/display-in-bottom-side-window~ action that
+The following action is essentially the same as [[help:display-buffer-in-side-window][display-buffer-in-side-window]]
+but additionally enables [[help:tab-line-mode][tab-line-mode]] for that buffer.
 
-- [ ] Will display the buffer in a bottom side window
-- [ ] Will enable ~tab-line-mode~ for that buffer
-- [ ] Will set  ~no-other-window . t~ in the window's parameters so that it
-  cannot be selected through =C-x o=
+#+begin_src emacs-lisp :noweb-ref window-functions
+  (defun me/display-tabbed-buffer-in-side-window (buffer alist)
+    "See `display-buffer-in-side-window'"
+    (display-buffer-in-side-window buffer alist)
+    (with-current-buffer buffer
+      (tab-line-mode)))
+
+#+end_src
+
+***** FIXME Workaround
+
+Unfortunately for some reason the call to ~tab-line-mode~ does not take effect
+for shells and I'm not sure why yet. So let's also invoke it via the mode hooks
+
+#+begin_src emacs-lisp :noweb-ref window-functions
+  (dolist (hook '(shell-mode-hook
+                  eshell-mode-hook))
+    (add-hook hook (lambda () (tab-line-mode))))
+#+end_src
+
+**** "Standard" Profiles
+
+#+begin_src emacs-lisp :noweb-ref window-functions
+  (defun me/display-buffer-in-panel (predicate)
+    "Display buffers matching the given PREDICATE in the panel.
+
+  To borrow terminology from VSCode the panel is that collapsable
+  window at the bottom of the screen.
+  "
+    `(,predicate
+      (me/display-tabbed-buffer-in-side-window)
+      (window-height . 0.25)
+      (side . bottom)
+      (slot . 0)
+      (window-parameters . ((no-other-window . t)))))
+
+#+end_src
 
 * Programs
 
