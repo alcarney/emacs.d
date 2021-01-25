@@ -139,9 +139,34 @@ Disable a bunch of UI elements
 
 ** Buffers
 
-#+begin_src emacs-lisp :tangle init.el
+*** IBuffer
+
+#+begin_src emacs-lisp :tangle init.el :noweb yes
   (use-package ibuffer
-    :bind (("C-x C-b" . ibuffer)))
+    :bind (("C-x C-b" . ibuffer))
+    :config
+    <<ibuffer-config>>)
+#+end_src
+
+**** Window Placement
+
+I like ~ibuffer~ to open itself in a bottom side window, like many of the
+"additional" utilities I put down there
+
+#+begin_src emacs-lisp :noweb-ref window-placement-rules
+  ("\\*Ibuffer\\*"
+   (display-buffer-in-side-window)
+   (window-height . 0.25)
+   (side . bottom)
+   (slot . 0))
+#+end_src
+
+In order for ~ibuffer~ to call [[help:display-buffer][display-buffer]] and thus have the rules defined in
+[[help:display-buffer-alist][display-buffer-alist]] take effect we need to ensure that ~ibuffer~ opens itself
+in an "other window"
+
+#+begin_src emacs-lisp :noweb-ref ibuffer-config
+  (setq ibuffer-use-other-window t)
 #+end_src
 
 ** Completion
@@ -274,13 +299,14 @@ finding [[https://www.youtube.com/watch?v=rjOhJMbA-q0][this video]] on the  [[he
 offers a very rich framework for controlling what windows get opened where - I
 should have guessed!
 
-#+begin_src emacs-lisp :noweb-ref window-placement
+#+begin_src emacs-lisp :noweb-ref window-placement :noweb yes
   (setq display-buffer-alist
         `(("\\*Help\\*"
            (display-buffer-in-side-window)
            (window-height . 0.20)
            (side . top)
            (slot . 0))
+        <<window-placement-rules>>
           ("\\*\\(e?shell\\)\\*"
            (display-buffer-in-side-window)
            (window-height . 0.25)
@@ -310,6 +336,15 @@ The following function handles selecting buffers based on their major mode.
         (eq major-mode mode))))
 
 #+end_src
+
+**** TODO See if I can create my own custom action function that makes it easy to standardise buffer handling
+
+e.g. a ~me/display-in-bottom-side-window~ action that
+
+- [ ] Will display the buffer in a bottom side window
+- [ ] Will enable ~tab-line-mode~ for that buffer
+- [ ] Will set  ~no-other-window . t~ in the window's parameters so that it
+  cannot be selected through =C-x o=
 
 * Programs
 

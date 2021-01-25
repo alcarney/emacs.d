@@ -43,7 +43,9 @@
 (setq inhibit-startup-message t)
 
 (use-package ibuffer
-  :bind (("C-x C-b" . ibuffer)))
+  :bind (("C-x C-b" . ibuffer))
+  :config
+  (setq ibuffer-use-other-window t))
 
 (use-package icomplete
   :init
@@ -120,6 +122,11 @@
            (window-height . 0.20)
            (side . top)
            (slot . 0))
+        ("\\*Ibuffer\\*"
+         (display-buffer-in-side-window)
+         (window-height . 0.25)
+         (side . bottom)
+         (slot . 0))
           ("\\*\\(e?shell\\)\\*"
            (display-buffer-in-side-window)
            (window-height . 0.25)
