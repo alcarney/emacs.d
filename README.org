@@ -448,7 +448,6 @@ A collection of tweaks to apply when opening a new org file
     (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+end_src
 
-
 * Programming
 
 ** C
@@ -518,7 +517,8 @@ Tweaks to apply when opening Python files
 
 #+begin_src emacs-lisp :noweb-ref python-functions
   (defun me/python-mode-tweaks ()
-    (setq-local fill-column 88))
+    (setq-local fill-column 88)
+    (add-hook 'after-save-hook 'me/python-flake8-project 0 t))
 
 #+end_src
 
@@ -562,6 +562,52 @@ own.
 #+begin_src emacs-lisp :noweb-ref python-config
   (add-to-list 'python-shell-completion-native-disabled-interpreters
                "jupyter")
+#+end_src
+
+*** Flake8
+
+I want to run ~flake8~ on the current package every time I save a file. The
+method I'm currently using relies on finding the ~setup.py~ file for the current
+package and using [[help:compilation-start][compilation-start]] to run ~flake8~ in a compilation buffer.
+
+#+begin_src emacs-lisp :noweb-ref python-functions
+  (defun me/python-flake8-project ()
+    "Run flake8 on the current project in a compilation buffer.
+
+  This function will attempt to find the setup.py file for the
+  package currently being edited using `me/python-find-setup-py'.
+  If a filepath is found, its parent directory is assumed to be the
+  package root and flake8 will be run in a compilation buffer via
+  `compilation-start'."
+    (interactive)
+    (let* ((filename (buffer-file-name (current-buffer)))
+           (setup-py (me/python-find-setup-py filename)))
+      (unless (null setup-py)
+        (let ((default-directory (file-name-directory setup-py)))
+          (compilation-start "flake8" nil
+                             (lambda (_modename)
+                               (format "%s: flake8" default-directory)))))))
+
+#+end_src
+
+The following methods handle the recursing up the directory tree to find the ~setup.py~
+
+#+begin_src emacs-lisp :noweb-ref python-functions
+  (defun me/python-find-setup-py--from-dir (dir)
+    (if (string= dir "/")
+        nil
+      (let* ((setup-py (concat dir "setup.py")))
+        (if (file-exists-p setup-py)
+            setup-py
+          (me/python-find-setup-py
+           (file-name-directory (directory-file-name dir)))))))
+
+  (defun me/python-find-setup-py (filename)
+    "Find the setup.py file that corresponds with the package that
+  contains FILENAME"
+    (me/python-find-setup-py--from-dir
+     (file-name-directory filename)))
+
 #+end_src
 
 *** Additional Packages

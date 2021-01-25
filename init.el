@@ -227,7 +227,8 @@
   (setq compilation-scroll-output t))
 
 (defun me/python-mode-tweaks ()
-  (setq-local fill-column 88))
+  (setq-local fill-column 88)
+  (add-hook 'after-save-hook 'me/python-flake8-project 0 t))
 
 (defun me/python-open-repl ()
   "Open a Python REPL in the correct virtualenv for the
@@ -250,6 +251,38 @@ it's not installed."
       (setq python-shell-interpreter-args "-i"))
 
     (run-python)))
+(defun me/python-flake8-project ()
+  "Run flake8 on the current project in a compilation buffer.
+
+This function will attempt to find the setup.py file for the
+package currently being edited using `me/python-find-setup-py'.
+If a filepath is found, its parent directory is assumed to be the
+package root and flake8 will be run in a compilation buffer via
+`compilation-start'."
+  (interactive)
+  (let* ((filename (buffer-file-name (current-buffer)))
+         (setup-py (me/python-find-setup-py filename)))
+    (unless (null setup-py)
+      (let ((default-directory (file-name-directory setup-py)))
+        (compilation-start "flake8" nil
+                           (lambda (_modename)
+                             (format "%s: flake8" default-directory)))))))
+
+(defun me/python-find-setup-py--from-dir (dir)
+  (if (string= dir "/")
+      nil
+    (let* ((setup-py (concat dir "setup.py")))
+      (if (file-exists-p setup-py)
+          setup-py
+        (me/python-find-setup-py
+         (file-name-directory (directory-file-name dir)))))))
+
+(defun me/python-find-setup-py (filename)
+  "Find the setup.py file that corresponds with the package that
+contains FILENAME"
+  (me/python-find-setup-py--from-dir
+   (file-name-directory filename)))
+
 
 (use-package blacken
   :ensure t
