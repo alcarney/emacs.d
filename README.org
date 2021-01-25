@@ -364,6 +364,48 @@ for shells and I'm not sure why yet. So let's also invoke it via the mode hooks
 #+end_src
 
 * Programs
+** Dired
+
+#+begin_src emacs-lisp :tangle init.el :noweb yes
+  <<dired-functions>>
+
+  (use-package dired
+    :bind (("C-x d" . me/dired-open-directory))
+    :hook (dired-mode . me/dired-mode-tweaks))
+#+end_src
+
+*** Open dired directory
+
+A quick command that opens the ~default-directory~ in ~dired~
+
+#+begin_src emacs-lisp :noweb-ref dired-functions
+  (defun me/dired-open-directory ()
+    (interactive)
+    (dired default-directory))
+
+#+end_src
+
+*** Tweaks
+
+A collection of tweaks to apply to new ~dired~ buffers
+
+#+begin_src emacs-lisp :noweb-ref dired-functions
+  (defun me/dired-mode-tweaks ()
+    (dired-hide-details-mode))
+#+end_src
+
+*** Window Placement
+
+Ensure that ~dired~ buffers open in a side window
+
+#+begin_src emacs-lisp :noweb-ref window-placement-rules
+  (,(me/buffer-select-by-major-mode 'dired-mode)
+   (display-buffer-in-side-window)
+   (window-width . 0.15)
+   (side . left)
+   (slot . 0)
+   (window-parameters . ((no-other-window . t))))
+#+end_src
 
 ** Git
 

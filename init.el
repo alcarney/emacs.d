@@ -143,10 +143,27 @@ window at the bottom of the screen.
                                ,(me/display-buffer-in-panel
                                  (me/buffer-select-by-major-mode 'compilation-mode))
                                ,(me/display-buffer-in-panel "\\*Ibuffer\\*")
+                               (,(me/buffer-select-by-major-mode 'dired-mode)
+                                (display-buffer-in-side-window)
+                                (window-width . 0.15)
+                                (side . left)
+                                (slot . 0)
+                                (window-parameters . ((no-other-window . t))))
                                ,(me/display-buffer-in-panel
                                  (me/buffer-select-by-major-mode 'inferior-python-mode))
                                ))
   :bind (("<f8>" . window-toggle-side-windows)))
+
+(defun me/dired-open-directory ()
+  (interactive)
+  (dired default-directory))
+
+(defun me/dired-mode-tweaks ()
+  (dired-hide-details-mode))
+
+(use-package dired
+  :bind (("C-x d" . me/dired-open-directory))
+  :hook (dired-mode . me/dired-mode-tweaks))
 
 (use-package git-gutter
   :config
