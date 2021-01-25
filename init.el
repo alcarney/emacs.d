@@ -143,6 +143,8 @@ window at the bottom of the screen.
                                ,(me/display-buffer-in-panel
                                  (me/buffer-select-by-major-mode 'compilation-mode))
                                ,(me/display-buffer-in-panel "\\*Ibuffer\\*")
+                               ,(me/display-buffer-in-panel
+                                 (me/buffer-select-by-major-mode 'inferior-python-mode))
                                ))
   :bind (("<f8>" . window-toggle-side-windows)))
 

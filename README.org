@@ -616,6 +616,13 @@ own.
                "jupyter")
 #+end_src
 
+Ensure that the Python REPL opens in the "Panel"
+
+#+begin_src emacs-lisp :noweb-ref window-placement-rules
+  ,(me/display-buffer-in-panel
+    (me/buffer-select-by-major-mode 'inferior-python-mode))
+#+end_src
+
 *** Flake8
 
 I want to run ~flake8~ on the current package every time I save a file. The
