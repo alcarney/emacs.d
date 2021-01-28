@@ -45,6 +45,7 @@ My ~init.el~ file starts here
 #+begin_src emacs-lisp :tangle init.el
   ;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
   (defconst emacs-start-time (current-time))
+  (defconst mmdc-path "/home/alex/.npm-packages/bin/mmdc")
 #+end_src
 
 ** Packaging
@@ -299,6 +300,7 @@ should have guessed!
 
 #+begin_src emacs-lisp :noweb-ref window-placement :noweb yes
   (setq display-buffer-alist `(,(me/display-buffer-in-panel "\\*Help\\*")
+                               ,(me/display-buffer-in-panel "\\*Messages\\*")
                                ,(me/display-buffer-in-panel "\\*\\(e?shell\\)\\*")
                                ("\\*Process List\\*"             ;; Setting no-other-window etc seems to break C-x C-c
                                 (display-buffer-in-side-window)  ;; Error => Wrong type argument window-live-p, nil...
@@ -505,6 +507,8 @@ Ensure that ~dired~ buffers open in a side window
 ** Org Mode
 
 #+begin_src emacs-lisp :tangle init.el :noweb yes
+  <<org-packages>>
+
   <<org-functions>>
 
   (use-package org
@@ -762,6 +766,28 @@ is to install it via [[https://github.com/pipxproject/pipx][pipx]]
 
 #+begin_src sh
 pipx install black
+#+end_src
+
+** Mermaid
+
+ [[https://mermaid-js.github.io/mermaid/#/][Mermaid Diagrams]]
+
+ #+begin_src emacs-lisp :tangle init.el
+   (use-package mermaid-mode
+     :ensure t
+     :config
+     (setq mermaid-mmdc-location mmdc-path))
+#+end_src
+
+*** ob-mermaid
+
+[[https://github.com/arnm/ob-mermaid][ob-mermaid]] allows for mermaid diagrams to be used within Org Mode files
+
+#+begin_src emacs-lisp :noweb-ref org-packages
+  (use-package ob-mermaid
+    :ensure t
+    :config
+    (setq ob-mermaid-cli-path mmdc-path))
 #+end_src
 
 * Prose

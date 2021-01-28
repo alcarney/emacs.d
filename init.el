@@ -1,5 +1,6 @@
 ;;; init.el --- Emacs Configuration -*- lexical-binding: t -*-
 (defconst emacs-start-time (current-time))
+(defconst mmdc-path "/home/alex/.npm-packages/bin/mmdc")
 
 (require 'package)
 
@@ -152,6 +153,7 @@ window at the bottom of the screen.
   :init
   (setq window-sides-vertical t)
   (setq display-buffer-alist `(,(me/display-buffer-in-panel "\\*Help\\*")
+                               ,(me/display-buffer-in-panel "\\*Messages\\*")
                                ,(me/display-buffer-in-panel "\\*\\(e?shell\\)\\*")
                                ("\\*Process List\\*"             ;; Setting no-other-window etc seems to break C-x C-c
                                 (display-buffer-in-side-window)  ;; Error => Wrong type argument window-live-p, nil...
@@ -212,6 +214,11 @@ window at the bottom of the screen.
 (use-package project
   :bind (("C-x p f" . project-find-file)
          ("C-x p s" . me/project-search)))
+
+(use-package ob-mermaid
+  :ensure t
+  :config
+  (setq ob-mermaid-cli-path mmdc-path))
 
 (defun me/org-mode-tweaks ()
   (setq-local fill-column 80)
@@ -344,6 +351,11 @@ contains FILENAME"
   (setq compilation-scroll-output t)
   (add-to-list 'python-shell-completion-native-disabled-interpreters
                "jupyter"))
+
+(use-package mermaid-mode
+  :ensure t
+  :config
+  (setq mermaid-mmdc-location mmdc-path))
 
 (defun me/gfm-mode-tweaks ()
   (setq-local fill-column 80)
