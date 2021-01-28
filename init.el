@@ -119,9 +119,6 @@
   (with-current-buffer buffer
     (tab-line-mode)))
 
-(dolist (hook '(shell-mode-hook
-                eshell-mode-hook))
-  (add-hook hook (lambda () (tab-line-mode))))
 (defun me/display-buffer-in-panel (predicate)
   "Display buffers matching the given PREDICATE in the panel.
 
@@ -133,15 +130,37 @@ window at the bottom of the screen.
     (window-height . 0.25)
     (side . bottom)
     (slot . 0)
-    (window-parameters . ((no-other-window . t)))))
+    (window-parameters . ((no-other-window . t)
+                          (no-delete-other-windows . t)))))
+
+(dolist (hook '(shell-mode-hook
+                eshell-mode-hook))
+  (add-hook hook (lambda () (tab-line-mode))))
+
+(defun me/display-buffer-in-top-window (predicate)
+  "Display buffers matching the given PREDICATE in a top side window."
+
+  `(,predicate
+      (display-buffer-in-side-window)
+      (window-height . 0.2)
+      (side . top)
+      (slot . 0)
+      (window-parameters . ((no-other-window . t)))))
 
 
 (use-package window
   :init
+  (setq window-sides-vertical t)
   (setq display-buffer-alist `(,(me/display-buffer-in-panel "\\*Help\\*")
                                ,(me/display-buffer-in-panel "\\*\\(e?shell\\)\\*")
+                               ("\\*Process List\\*"             ;; Setting no-other-window etc seems to break C-x C-c
+                                (display-buffer-in-side-window)  ;; Error => Wrong type argument window-live-p, nil...
+                                (side . bottom)
+                                (slot . 0)
+                                (window-height . 0.25))
                                ,(me/display-buffer-in-panel
                                  (me/buffer-select-by-major-mode 'compilation-mode))
+                               ,(me/display-buffer-in-top-window "\\*Completions\\*")
                                ,(me/display-buffer-in-panel "\\*Ibuffer\\*")
                                (,(me/buffer-select-by-major-mode 'dired-mode)
                                 (display-buffer-in-side-window)

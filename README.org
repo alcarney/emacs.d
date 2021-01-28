@@ -284,6 +284,7 @@ themselves rendered
 
   (use-package window
     :init
+    <<window-config>>
     <<window-placement>>
     :bind (("<f8>" . window-toggle-side-windows)))
 #+end_src
@@ -299,13 +300,26 @@ should have guessed!
 #+begin_src emacs-lisp :noweb-ref window-placement :noweb yes
   (setq display-buffer-alist `(,(me/display-buffer-in-panel "\\*Help\\*")
                                ,(me/display-buffer-in-panel "\\*\\(e?shell\\)\\*")
+                               ("\\*Process List\\*"             ;; Setting no-other-window etc seems to break C-x C-c
+                                (display-buffer-in-side-window)  ;; Error => Wrong type argument window-live-p, nil...
+                                (side . bottom)
+                                (slot . 0)
+                                (window-height . 0.25))
                                ,(me/display-buffer-in-panel
                                  (me/buffer-select-by-major-mode 'compilation-mode))
+                               ,(me/display-buffer-in-top-window "\\*Completions\\*")
                                <<window-placement-rules>>
                                ))
 #+end_src
 
-**** Custom Filters
+I'd rather have the left/right side windows take the full height of the frame,
+thankfully [[help:window-sides-vertical][window-sides-vertical]] is just the option I'm looking for
+
+#+begin_src emacs-lisp :noweb-ref window-config
+  (setq window-sides-vertical t)
+#+end_src
+
+**** Select By Major Mode
 
 The following function handles selecting buffers based on their major mode.
 **Requires lexical-binding**
@@ -320,7 +334,7 @@ The following function handles selecting buffers based on their major mode.
 
 #+end_src
 
-**** Custom Actions
+**** Display in Panel
 
 The following action is essentially the same as [[help:display-buffer-in-side-window][display-buffer-in-side-window]]
 but additionally enables [[help:tab-line-mode][tab-line-mode]] for that buffer.
@@ -334,18 +348,8 @@ but additionally enables [[help:tab-line-mode][tab-line-mode]] for that buffer.
 
 #+end_src
 
-***** FIXME Workaround
-
-Unfortunately for some reason the call to ~tab-line-mode~ does not take effect
-for shells and I'm not sure why yet. So let's also invoke it via the mode hooks
-
-#+begin_src emacs-lisp :noweb-ref window-functions
-  (dolist (hook '(shell-mode-hook
-                  eshell-mode-hook))
-    (add-hook hook (lambda () (tab-line-mode))))
-#+end_src
-
-**** "Standard" Profiles
+The following then makes use of the above action to place matching buffers in a
+"panel" similar to how VSCode does things
 
 #+begin_src emacs-lisp :noweb-ref window-functions
   (defun me/display-buffer-in-panel (predicate)
@@ -359,7 +363,39 @@ for shells and I'm not sure why yet. So let's also invoke it via the mode hooks
       (window-height . 0.25)
       (side . bottom)
       (slot . 0)
-      (window-parameters . ((no-other-window . t)))))
+      (window-parameters . ((no-other-window . t)
+                            (no-delete-other-windows . t)))))
+
+#+end_src
+
+
+***** FIXME Workaround
+
+Unfortunately for some reason the call to ~tab-line-mode~ does not take effect
+for shells and I'm not sure why yet. So let's also invoke it via the mode hooks
+
+#+begin_src emacs-lisp :noweb-ref window-functions
+  (dolist (hook '(shell-mode-hook
+                  eshell-mode-hook))
+    (add-hook hook (lambda () (tab-line-mode))))
+
+#+end_src
+
+**** Display In Top Window
+
+I quite like having any temporary buffers like =*Completions*= pop up in a top
+side window and then vanish again.
+
+#+begin_src emacs-lisp :noweb-ref window-functions
+  (defun me/display-buffer-in-top-window (predicate)
+    "Display buffers matching the given PREDICATE in a top side window."
+
+    `(,predicate
+        (display-buffer-in-side-window)
+        (window-height . 0.2)
+        (side . top)
+        (slot . 0)
+        (window-parameters . ((no-other-window . t)))))
 
 #+end_src
 
