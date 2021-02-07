@@ -445,6 +445,80 @@ Ensure that ~dired~ buffers open in a side window
    (window-parameters . ((no-other-window . t))))
 #+end_src
 
+** Elfeed
+
+   [[https://github.com/skeeto/elfeed][elfeed]] is an RSS feed reader for Emacs.
+
+#+begin_src emacs-lisp :tangle init.el :noweb yes
+  <<elfeed-functions>>
+
+  (use-package elfeed
+    :bind (("C-c e" . elfeed)
+           :map elfeed-search-mode-map
+           ("g" . me/elfeed-update))
+    :ensure t
+    :config
+    (setq elfeed-use-curl t))
+#+end_src
+
+*** Feeds
+
+I know that there's the [[https://github.com/remyhonig/elfeed-org][elfeed-org]] package that lets you configure elfeed feeds
+through an org file, but I thought it would be a good exercise in Elisp to see
+if I could put something similar together.
+
+Rather than using headlines I've thrown all the links and corresponding tags
+into a table and wrote a few functions that will convert the table into the
+format required by [[help:elfeed-feeds][elfeed-feeds]] and set the variable to the result.
+
+#+NAME: elfeed-feed-table
+| URL                                             | Tags        |
+|-------------------------------------------------+-------------|
+| https://pointieststick.com/feed/                | linux kde   |
+| https://blog.gtk.org/rss                        | linux gtk   |
+| https://blogs.gnome.org/shell-dev/rss           | linux gnome |
+| https://sachachua.com/blog/category/emacs/feed/ | emacs       |
+
+#+NAME:feeds
+#+begin_src emacs-lisp :noweb-ref elfeed-functions
+  (defun me/feed-table-row-to-item (row)
+    "Convert a ROW from a feed table into a valid elfeed entry"
+    (let* ((url     (car row))
+           (tags    (split-string (cadr row) " ")))
+
+      (append (list url) (mapcar 'make-symbol tags))))
+
+  (defun me/feed-table-to-list (feed-table)
+    "Convert an orgmode FEED-TABLE to a list compatible with elfeed."
+    (mapcar 'me/feed-table-row-to-item feed-table))
+
+
+  (defun me/feed-table-extract ()
+    "Find the table called `elfeed-feed-table' in my config file
+  and use it to set the `elfeed-feeds' variable."
+    (with-temp-buffer
+      (insert-file-contents "/home/alex/.emacs.d/README.org")
+      (org-table-map-tables (lambda ()
+                              (setq tbl-name (plist-get (cadr (org-element-at-point)) :name))
+                              (if (string= tbl-name "elfeed-feed-table")
+                                  (let ((tbl (cdr (cdr (org-table-to-lisp)))))
+                                    (setq elfeed-feeds (me/feed-table-to-list tbl)))))
+                            t)))
+
+  (defun me/elfeed-update (arg)
+    "Refresh all RSS feeds.
+
+    This simply calls `elfeed-update' unless the prefix arg is set
+    or `elfeed-feeds' is nil in which case it will call
+    `me/feed-table-extract' beforehand."
+    (interactive "P")
+    (if (or (not (null arg))
+                (null elfeed-feeds))
+        (me/feed-table-extract))
+    (elfeed-update))
+#+end_src
+
+
 ** Git
 
 *** Git Gutter

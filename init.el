@@ -186,6 +186,50 @@ window at the bottom of the screen.
   :bind (("C-x d" . me/dired-open-directory))
   :hook (dired-mode . me/dired-mode-tweaks))
 
+(defun me/feed-table-row-to-item (row)
+  "Convert a ROW from a feed table into a valid elfeed entry"
+  (let* ((url     (car row))
+         (tags    (split-string (cadr row) " ")))
+
+    (append (list url) (mapcar 'make-symbol tags))))
+
+(defun me/feed-table-to-list (feed-table)
+  "Convert an orgmode FEED-TABLE to a list compatible with elfeed."
+  (mapcar 'me/feed-table-row-to-item feed-table))
+
+
+(defun me/feed-table-extract ()
+  "Find the table called `elfeed-feed-table' in my config file
+and use it to set the `elfeed-feeds' variable."
+  (with-temp-buffer
+    (insert-file-contents "/home/alex/.emacs.d/README.org")
+    (org-table-map-tables (lambda ()
+                            (setq tbl-name (plist-get (cadr (org-element-at-point)) :name))
+                            (if (string= tbl-name "elfeed-feed-table")
+                                (let ((tbl (cdr (cdr (org-table-to-lisp)))))
+                                  (setq elfeed-feeds (me/feed-table-to-list tbl)))))
+                          t)))
+
+(defun me/elfeed-update (arg)
+  "Refresh all RSS feeds.
+
+  This simply calls `elfeed-update' unless the prefix arg is set
+  or `elfeed-feeds' is nil in which case it will call
+  `me/feed-table-extract' beforehand."
+  (interactive "P")
+  (if (or (not (null arg))
+              (null elfeed-feeds))
+      (me/feed-table-extract))
+  (elfeed-update))
+
+(use-package elfeed
+  :bind (("C-c e" . elfeed)
+         :map elfeed-search-mode-map
+         ("g" . me/elfeed-update))
+  :ensure t
+  :config
+  (setq elfeed-use-curl t))
+
 (use-package git-gutter
   :config
   (global-git-gutter-mode 1)
