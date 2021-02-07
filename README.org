@@ -534,7 +534,8 @@ loaded support for it
 #+begin_src emacs-lisp :noweb-ref org-config
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((emacs-lisp . t)
-                                 (python . t)))
+                                 (python . t)
+                                 (shell . t)))
 #+end_src
 
 *** Org Capture
@@ -546,14 +547,15 @@ loaded support for it
           ("e" "Event" entry (file+headline "life.org" "Events")
            "* %?\nSCHEDULED: %^t")
           ("j" "Journal" entry (file+headline "life.org" "Journal")
-           "* %u\n%?\n\n** Exercise\n")))
+           "* %u\n%?\n\n** Exercise\n" :prepend t)))
 #+end_src
 
 *** TODOs and Habits
 
 #+begin_src emacs-lisp :noweb-ref org-config
   (add-to-list 'org-modules 'org-habit t)
-  (setq org-habit-show-all-today t
+  (setq org-adapt-indentation 'headline-data
+        org-habit-show-all-today t
         org-log-into-drawer t)
 #+end_src
 
@@ -567,7 +569,6 @@ A collection of tweaks to apply when opening a new org file
     (turn-on-auto-fill)
     (flyspell-mode)
 
-    (org-indent-mode)
     (variable-pitch-mode 1)
 
     ;; Switch certain elements back to fixed pitch

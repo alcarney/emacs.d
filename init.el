@@ -225,7 +225,6 @@ window at the bottom of the screen.
   (turn-on-auto-fill)
   (flyspell-mode)
 
-  (org-indent-mode)
   (variable-pitch-mode 1)
 
   ;; Switch certain elements back to fixed pitch
@@ -248,16 +247,18 @@ window at the bottom of the screen.
   (setq org-agenda-files (list org-directory))
   (org-babel-do-load-languages 'org-babel-load-languages
                                '((emacs-lisp . t)
-                                 (python . t)))
+                                 (python . t)
+                                 (shell . t)))
   (setq org-capture-templates
         '(("t" "Task" entry (file+headline "life.org" "Events")
            "* TODO %?\n")
           ("e" "Event" entry (file+headline "life.org" "Events")
            "* %?\nSCHEDULED: %^t")
           ("j" "Journal" entry (file+headline "life.org" "Journal")
-           "* %u\n%?\n\n** Exercise\n")))
+           "* %u\n%?\n\n** Exercise\n" :prepend t)))
   (add-to-list 'org-modules 'org-habit t)
-  (setq org-habit-show-all-today t
+  (setq org-adapt-indentation 'headline-data
+        org-habit-show-all-today t
         org-log-into-drawer t))
 
 (defun me/start-debugging ()
