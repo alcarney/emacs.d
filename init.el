@@ -229,6 +229,7 @@ window at the bottom of the screen.
 
   ;; Switch certain elements back to fixed pitch
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-link nil :inherit '(button fixed-pitch))
   (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-table nil :inherit '(shadow fixed-pitch))
   (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
