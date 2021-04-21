@@ -355,8 +355,7 @@ and use it to set the `elfeed-feeds' variable."
   (setq compilation-scroll-output t))
 
 (defun me/python-mode-tweaks ()
-  (setq-local fill-column 88)
-  (add-hook 'after-save-hook 'me/python-flake8-project 0 t))
+  (setq-local fill-column 88))
 
 (defun me/python-open-repl ()
   "Open a Python REPL in the correct virtualenv for the

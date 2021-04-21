@@ -779,8 +779,7 @@ Tweaks to apply when opening Python files
 
 #+begin_src emacs-lisp :noweb-ref python-functions
   (defun me/python-mode-tweaks ()
-    (setq-local fill-column 88)
-    (add-hook 'after-save-hook 'me/python-flake8-project 0 t))
+    (setq-local fill-column 88))
 
 #+end_src
 
