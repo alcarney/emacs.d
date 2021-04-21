@@ -6,7 +6,7 @@
  '(custom-safe-themes
    '("2f1518e906a8b60fac943d02ad415f1d8b3933a5a7f75e307e6e9a26ef5bf570" default))
  '(package-selected-packages
-   '(elfeed mermaid-mode ob-mermaid blacken modus-themes rg markdown-mode dired all-the-icons-dired rust-mode web-mode ein yaml-mode elpy treemacs magit git-gutter counsel doom-modeline all-the-icons use-package))
+   '(lsp-mode elfeed mermaid-mode ob-mermaid blacken modus-themes rg markdown-mode dired all-the-icons-dired rust-mode web-mode ein yaml-mode elpy treemacs magit git-gutter counsel doom-modeline all-the-icons use-package))
  '(safe-local-variable-values
    '((eval add-hook 'after-save-hook
            (lambda nil

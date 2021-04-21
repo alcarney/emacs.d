@@ -586,38 +586,15 @@ manages its buffers
     :bind (("C-x g" . magit-status)))
 #+end_src
 
-** Project Management
+** LSP Mode
 
-#+begin_src emacs-lisp :tangle init.el :noweb yes
-  <<project-functions>>
-
-  <<project-packages>>
-
-  (use-package project
-    :bind (("C-x p f" . project-find-file)
-           ("C-x p s" . me/project-search)))
-#+end_src
-
-*** Project -wide Search
-
-#+begin_src emacs-lisp :noweb-ref project-functions
-  (defun me/project-search ()
-    "Execute a project wide search with ripgrep."
-    (interactive)
-    (let ((dir   (cdr (project-current t)))
-          (query (read-string "Search query: ")))
-      (rg query "*" dir)))
-#+end_src
-
-**** TODO Check for a prefix argument and prompt for the filename pattern to search on?
-
-*** Additional Packages
-
-[[https://github.com/dajva/rg.el][rg]] is an Emacs frontend to [[https://github.com/BurntSushi/ripgrep][ripgrep]].
-
-#+begin_src emacs-lisp :noweb-ref project-packages
-  (use-package rg
-    :ensure t)
+#+begin_src emacs-lisp :tangle init.el
+  (use-package lsp-mode
+    :ensure t
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :hook ((python-mode . lsp))
+    :commands lsp)
 #+end_src
 
 ** Org Mode
@@ -700,6 +677,39 @@ A collection of tweaks to apply when opening a new org file
     (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+end_src
 
+** Project Management
+
+#+begin_src emacs-lisp :tangle init.el :noweb yes
+  <<project-functions>>
+
+  <<project-packages>>
+
+  (use-package project
+    :bind (("C-x p f" . project-find-file)
+           ("C-x p s" . me/project-search)))
+#+end_src
+
+*** Project -wide Search
+
+#+begin_src emacs-lisp :noweb-ref project-functions
+  (defun me/project-search ()
+    "Execute a project wide search with ripgrep."
+    (interactive)
+    (let ((dir   (cdr (project-current t)))
+          (query (read-string "Search query: ")))
+      (rg query "*" dir)))
+#+end_src
+
+**** TODO Check for a prefix argument and prompt for the filename pattern to search on?
+
+*** Additional Packages
+
+[[https://github.com/dajva/rg.el][rg]] is an Emacs frontend to [[https://github.com/BurntSushi/ripgrep][ripgrep]].
+
+#+begin_src emacs-lisp :noweb-ref project-packages
+  (use-package rg
+    :ensure t)
+#+end_src
 * Programming
 
 ** C

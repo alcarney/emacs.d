@@ -266,19 +266,12 @@ and use it to set the `elfeed-feeds' variable."
 (use-package magit
   :bind (("C-x g" . magit-status)))
 
-(defun me/project-search ()
-  "Execute a project wide search with ripgrep."
-  (interactive)
-  (let ((dir   (cdr (project-current t)))
-        (query (read-string "Search query: ")))
-    (rg query "*" dir)))
-
-(use-package rg
-  :ensure t)
-
-(use-package project
-  :bind (("C-x p f" . project-find-file)
-         ("C-x p s" . me/project-search)))
+(use-package lsp-mode
+  :ensure t
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((python-mode . lsp))
+  :commands lsp)
 
 (use-package ob-mermaid
   :ensure t
@@ -326,6 +319,20 @@ and use it to set the `elfeed-feeds' variable."
   (setq org-adapt-indentation 'headline-data
         org-habit-show-all-today t
         org-log-into-drawer t))
+
+(defun me/project-search ()
+  "Execute a project wide search with ripgrep."
+  (interactive)
+  (let ((dir   (cdr (project-current t)))
+        (query (read-string "Search query: ")))
+    (rg query "*" dir)))
+
+(use-package rg
+  :ensure t)
+
+(use-package project
+  :bind (("C-x p f" . project-find-file)
+         ("C-x p s" . me/project-search)))
 
 (defun me/start-debugging ()
   (interactive)
