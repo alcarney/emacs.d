@@ -170,6 +170,9 @@ window at the bottom of the screen.
                                 (side . left)
                                 (slot . 0)
                                 (window-parameters . ((no-other-window . t))))
+                               ("\\*elfeed-entry\\*"
+                                 (display-buffer-reuse-mode-window display-buffer-at-bottom)
+                                 (window-height . 0.8))
                                ,(me/display-buffer-in-panel
                                  (me/buffer-select-by-major-mode 'inferior-python-mode))
                                ))
@@ -185,6 +188,20 @@ window at the bottom of the screen.
 (use-package dired
   :bind (("C-x d" . me/dired-open-directory))
   :hook (dired-mode . me/dired-mode-tweaks))
+
+(defun me/elfeed-start-new-tab ()
+  "Does the work of creating a new tab"
+  (tab-bar-new-tab)
+  (tab-bar-rename-tab "elfeed")
+  (elfeed))
+
+(defun me/elfeed-start ()
+  "Switch to the elfeed tab, create one if it doesn't exist."
+  (interactive)
+  (let ((tabs (mapcar (lambda (tab) (alist-get 'name tab)) (tab-bar-tabs))))
+    (if (member "elfeed" tabs)
+        (tab-bar-select-tab-by-name "elfeed")
+      (me/elfeed-start-new-tab))))
 
 (defun me/feed-table-row-to-item (row)
   "Convert a ROW from a feed table into a valid elfeed entry"
@@ -223,12 +240,16 @@ and use it to set the `elfeed-feeds' variable."
   (elfeed-update))
 
 (use-package elfeed
-  :bind (("C-c e" . elfeed)
+  :bind (("C-c e" . me/elfeed-start)
          :map elfeed-search-mode-map
-         ("g" . me/elfeed-update))
+         ("g" . me/elfeed-update)
+         :map elfeed-show-mode-map
+         ("q" . delete-window))
   :ensure t
   :config
-  (setq elfeed-use-curl t))
+  (setq elfeed-use-curl t)
+  (setq elfeed-show-entry-switch 'pop-to-buffer)
+  (setq elfeed-show-entry-delete 'delete-window))
 
 (use-package git-gutter
   :config

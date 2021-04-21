@@ -453,12 +453,36 @@ Ensure that ~dired~ buffers open in a side window
   <<elfeed-functions>>
 
   (use-package elfeed
-    :bind (("C-c e" . elfeed)
+    :bind (("C-c e" . me/elfeed-start)
            :map elfeed-search-mode-map
-           ("g" . me/elfeed-update))
+           ("g" . me/elfeed-update)
+           :map elfeed-show-mode-map
+           ("q" . delete-window))
     :ensure t
     :config
-    (setq elfeed-use-curl t))
+    (setq elfeed-use-curl t)
+    <<elfeed-config>>)
+#+end_src
+
+*** Startup
+
+Custom startup function to ensure that elfeed runs in a dedicated tab.
+
+#+begin_src emacs-lisp :noweb-ref elfeed-functions
+  (defun me/elfeed-start-new-tab ()
+    "Does the work of creating a new tab"
+    (tab-bar-new-tab)
+    (tab-bar-rename-tab "elfeed")
+    (elfeed))
+
+  (defun me/elfeed-start ()
+    "Switch to the elfeed tab, create one if it doesn't exist."
+    (interactive)
+    (let ((tabs (mapcar (lambda (tab) (alist-get 'name tab)) (tab-bar-tabs))))
+      (if (member "elfeed" tabs)
+          (tab-bar-select-tab-by-name "elfeed")
+        (me/elfeed-start-new-tab))))
+
 #+end_src
 
 *** Feeds
@@ -472,12 +496,13 @@ into a table and wrote a few functions that will convert the table into the
 format required by [[help:elfeed-feeds][elfeed-feeds]] and set the variable to the result.
 
 #+NAME: elfeed-feed-table
-| URL                                             | Tags        |
-|-------------------------------------------------+-------------|
-| https://pointieststick.com/feed/                | linux kde   |
-| https://blog.gtk.org/rss                        | linux gtk   |
-| https://blogs.gnome.org/shell-dev/rss           | linux gnome |
-| https://sachachua.com/blog/category/emacs/feed/ | emacs       |
+| URL                                                                          | Tags        |
+|------------------------------------------------------------------------------+-------------|
+| https://pointieststick.com/feed/                                             | linux kde   |
+| https://blog.gtk.org/rss                                                     | linux gtk   |
+| https://blogs.gnome.org/shell-dev/rss                                        | linux gnome |
+| https://sachachua.com/blog/category/emacs/feed/                              | emacs       |
+| https://www.youtube.com/feeds/videos.xml?channel_id=UC5Qw7uMu8_QMJHBw3mQJ62w | linux yt    |
 
 #+NAME:feeds
 #+begin_src emacs-lisp :noweb-ref elfeed-functions
@@ -518,6 +543,23 @@ format required by [[help:elfeed-feeds][elfeed-feeds]] and set the variable to t
     (elfeed-update))
 #+end_src
 
+***  Window Placement
+
+Open article buffers below the main summary list.
+
+#+begin_src emacs-lisp :noweb-ref window-placement-rules
+  ("\\*elfeed-entry\\*"
+    (display-buffer-reuse-mode-window display-buffer-at-bottom)
+    (window-height . 0.8))
+#+end_src
+
+In order for this setting to work as expected though we need to tweak how elfeed
+manages its buffers
+
+#+begin_src emacs-lisp :noweb-ref elfeed-config
+(setq elfeed-show-entry-switch 'pop-to-buffer)
+(setq elfeed-show-entry-delete 'delete-window)
+#+end_src
 
 ** Git
 
