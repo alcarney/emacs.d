@@ -362,7 +362,11 @@ and use it to set the `elfeed-feeds' variable."
   project.
 
 This will first look for Jupyter and will fall back to Python if
-it's not installed."
+it's not installed.
+
+It will attempt to find the root folder for the current package
+and open the shell there.
+"
   (interactive)
   (let* ((dir   (cdr (project-current t)))
          (paths (list
@@ -377,7 +381,10 @@ it's not installed."
         (setq python-shell-interpreter-args "console --simple-prompt")
       (setq python-shell-interpreter-args "-i"))
 
-    (run-python)))
+    (let* ((package-dir (me/python-find-setup-py
+                         (buffer-file-name (current-buffer))))
+           (default-directory (file-name-directory package-dir)))
+      (run-python))))
 (defun me/python-flake8-project ()
   "Run flake8 on the current project in a compilation buffer.
 

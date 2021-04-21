@@ -799,7 +799,11 @@ installed.
     project.
 
   This will first look for Jupyter and will fall back to Python if
-  it's not installed."
+  it's not installed.
+
+  It will attempt to find the root folder for the current package
+  and open the shell there.
+  "
     (interactive)
     (let* ((dir   (cdr (project-current t)))
            (paths (list
@@ -814,7 +818,10 @@ installed.
           (setq python-shell-interpreter-args "console --simple-prompt")
         (setq python-shell-interpreter-args "-i"))
 
-      (run-python)))
+      (let* ((package-dir (me/python-find-setup-py
+                           (buffer-file-name (current-buffer))))
+             (default-directory (file-name-directory package-dir)))
+        (run-python))))
 #+end_src
 
 So that we get to use Jupyer's tab completion, we just need to tell Emacs to not use its
