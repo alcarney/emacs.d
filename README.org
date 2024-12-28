@@ -1,6 +1,8 @@
 #+TITLE: Emacs Configuration
 #+TODO: TODO FIXME | DONE FIXED
 
+*I no longer use this repo, my dotfiles are now part of my [[https://github.com/alcarney/blog][blog]]*
+
 * Setup
 
 ** Installing Emacs
